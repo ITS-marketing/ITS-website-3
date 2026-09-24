@@ -1,0 +1,277 @@
+@import 'tailwindcss';
+
+@source "../views/**/*.blade.php";
+@source "../js/**/*.js";
+@source "../../app/**/*.php";
+
+/* ------------------------------------------------------------------ */
+/* Design tokens (IT Synergy). Gebruik: bg-its-primary, text-its-dark  */
+/* of var(--its-primary). Hoog-contrast overschrijft de variabelen.    */
+/* ------------------------------------------------------------------ */
+:root {
+    --its-primary: #0072cc;
+    --its-blue: #003b60;
+    --its-dark: #0d1d2c;
+    --its-orange: #fc6e20;
+    --its-orange-dark: #e05810;
+    --its-text: #020101;
+    --its-gray-light: #f5f5f7;
+    --its-gray: #d5d5d5;
+}
+
+[data-hc] {
+    --its-primary: #004c99;
+    --its-blue: #002a54;
+    --its-dark: #000;
+    --its-orange: #b84000;
+    --its-orange-dark: #922e00;
+    --its-text: #000;
+    --its-gray-light: #f0f0f0;
+    --its-gray: #767676;
+}
+
+@media (prefers-contrast: more) {
+    :root {
+        --its-primary: #004c99;
+        --its-blue: #002a54;
+        --its-dark: #000;
+        --its-orange: #b84000;
+        --its-orange-dark: #922e00;
+        --its-text: #000;
+        --its-gray-light: #f0f0f0;
+        --its-gray: #767676;
+    }
+}
+
+@theme inline {
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+
+    --color-its-primary: var(--its-primary);
+    --color-its-blue: var(--its-blue);
+    --color-its-dark: var(--its-dark);
+    --color-its-orange: var(--its-orange);
+    --color-its-orange-dark: var(--its-orange-dark);
+    --color-its-text: var(--its-text);
+    --color-its-gray-light: var(--its-gray-light);
+    --color-its-gray: var(--its-gray);
+    --color-its-sky: #eef6ff;
+}
+
+/* Origineel verkleint text-sm t/m text-xl naar 13px op mobiel. */
+@media (max-width: 639.98px) {
+    :root {
+        --text-xl: 0.8125rem;
+        --text-lg: 0.8125rem;
+        --text-base: 0.8125rem;
+        --text-sm: 0.8125rem;
+    }
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+    }
+
+    body {
+        color: var(--its-text);
+    }
+
+    button {
+        cursor: pointer;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Utilities                                                           */
+/* ------------------------------------------------------------------ */
+@utility gradient-orange {
+    background: linear-gradient(135deg, var(--its-orange), var(--its-orange-dark));
+}
+
+@utility gradient-secondary {
+    background: linear-gradient(135deg, var(--its-blue), var(--its-dark));
+}
+
+@utility gradient-deep {
+    background: linear-gradient(135deg, var(--its-primary), var(--its-dark));
+}
+
+@utility gradient-footer {
+    background: linear-gradient(180deg, var(--its-blue) 0%, var(--its-dark) 100%);
+}
+
+@utility no-scrollbar {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Container die rechts doorloopt (sliders): content 86rem gecentreerd. */
+@utility slider-inset {
+    padding-left: max(2rem, calc(50vw - 43rem));
+    padding-right: max(2rem, calc(50vw - 43rem));
+
+    @media (width >= 64rem) and (width < 96rem) {
+        padding-left: 120px;
+        padding-right: 120px;
+    }
+}
+
+@utility slider-inset-left {
+    padding-left: max(2rem, calc(50vw - 43rem));
+
+    @media (width >= 64rem) and (width < 96rem) {
+        padding-left: 120px;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Animaties                                                           */
+/* ------------------------------------------------------------------ */
+
+/* Scroll fade-in: [data-fade] (enkel) of [data-fade-stagger] (kinderen). Zie js/core/fade-in.js */
+/* Animatie met fill-mode 'backwards': na afloop gelden weer de eigen styles
+   van het element, dus hover-transities van kaarten blijven gewoon werken. */
+.js [data-fade]:not(.is-visible),
+.js [data-fade-stagger]:not(.is-visible) > * {
+    opacity: 0;
+}
+
+.js [data-fade].is-visible,
+.js [data-fade-stagger].is-visible > * {
+    animation: fadeUp 0.65s cubic-bezier(0.25, 0.1, 0.25, 1) var(--d, 0s) backwards;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(32px);
+    }
+}
+
+/* Hero: direct bij laden (niet op scroll) */
+.js [data-intro] {
+    animation: intro 0.55s cubic-bezier(0.25, 0.1, 0.25, 1) var(--d, 0s) backwards;
+}
+
+@keyframes intro {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.marquee {
+    animation: marquee 45s linear infinite;
+}
+
+.marquee-reverse {
+    animation: marquee 45s linear infinite reverse;
+}
+
+.marquee:hover,
+.marquee-reverse:hover {
+    animation-play-state: paused;
+}
+
+@keyframes lineReveal {
+    from {
+        transform: translateY(110%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Accordion: hoogte-animatie via grid-rows. Zie js/core/accordion.js */
+[data-accordion-panel] {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+        grid-template-rows 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
+        opacity 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+[data-accordion-panel] > * {
+    overflow: hidden;
+}
+
+[data-open] > [data-accordion-panel] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .js [data-fade],
+    .js [data-fade-stagger] > *,
+    .js [data-intro] {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Rich text uit de editor */
+.prose-its :where(p, ul, ol) {
+    margin-bottom: 1em;
+}
+
+.prose-its :where(ul) {
+    list-style: disc;
+    padding-left: 1.25em;
+}
+
+.prose-its :where(ol) {
+    list-style: decimal;
+    padding-left: 1.25em;
+}
+
+.prose-its :where(a) {
+    color: var(--its-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.prose-its :where(h2, h3) {
+    color: var(--its-primary);
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 1.5em 0 0.5em;
+}
+
+.prose-its :where(h2) {
+    font-size: 1.5rem;
+}
+
+.prose-its :where(h3) {
+    font-size: 1.25rem;
+}
+
+.prose-its :where(strong) {
+    font-weight: 700;
+}
